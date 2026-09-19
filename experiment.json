@@ -1,0 +1,13 @@
+{
+  "$schema": "./experiment.schema.json",
+  "slug": "example-experiment",
+  "title": "Example Experiment",
+  "repository": "https://github.com/abhinavjagan/cramzz-exp-example",
+  "pinnedCommit": "UNPINNED",
+  "status": "building",
+  "launchDate": null,
+  "hypothesis": "A specific audience will complete and share this experiment because it creates a quick, distinctive result.",
+  "sponsorInventory": [],
+  "analyticsIdentifier": "cramzz-exp-example"
+}
+
