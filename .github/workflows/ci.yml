@@ -13,6 +13,14 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  analytics-contract:
+    uses: abhinavjagan/cramzz-workflows/.github/workflows/analytics-contract.yml@24c00b5fff8727ddc5020218243c6de0c768690f
+    with:
+      contract_path: analytics-contract.json
+      workflows_ref: 24c00b5fff8727ddc5020218243c6de0c768690f
+    permissions:
+      contents: read
+
   verify:
     runs-on: ubuntu-latest
     steps:
@@ -26,6 +34,7 @@ jobs:
       - run: npm run build
         env:
           CRAMZZ_BASE_PATH: /e/example-experiment/
+          EXPERIMENT_SOURCE_COMMIT: ${{ github.sha }}
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: experiment-dist
@@ -53,11 +62,6 @@ jobs:
           CRAMZZ_BASE_PATH: /e/example-experiment/
 
   secrets:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
-        with:
-          fetch-depth: 0
-      - uses: gitleaks/gitleaks-action@ff98106e4c7b2bc287b24eaf42907196329070c7 # v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: abhinavjagan/cramzz-workflows/.github/workflows/secret-scan.yml@24c00b5fff8727ddc5020218243c6de0c768690f
+    permissions:
+      contents: read

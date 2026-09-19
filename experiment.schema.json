@@ -4,16 +4,30 @@
   "title": "Cramzz experiment manifest",
   "type": "object",
   "additionalProperties": false,
-  "required": [
-    "slug",
-    "title",
-    "repository",
-    "pinnedCommit",
-    "status",
-    "launchDate",
-    "hypothesis",
-    "sponsorInventory",
-    "analyticsIdentifier"
+  "required": ["slug", "title", "repository", "pinnedCommit", "status", "launchDate", "hypothesis", "sponsorInventory", "analyticsIdentifier"],
+  "allOf": [
+    {
+      "if": {
+        "type": "object",
+        "properties": { "status": { "enum": ["backlog", "building"] } },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": { "launchDate": { "const": null } }
+      }
+    },
+    {
+      "if": {
+        "type": "object",
+        "properties": { "status": { "enum": ["testing", "scaled", "iterating", "retired"] } },
+        "required": ["status"]
+      },
+      "then": {
+        "type": "object",
+        "properties": { "launchDate": { "type": "string", "format": "date" } }
+      }
+    }
   ],
   "properties": {
     "$schema": { "type": "string" },
@@ -42,4 +56,3 @@
     "analyticsIdentifier": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" }
   }
 }
-

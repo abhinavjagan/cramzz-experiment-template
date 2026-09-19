@@ -22,6 +22,21 @@ describe("experiment manifest", () => {
     );
   });
 
+  it("keeps pre-launch and launched lifecycle dates consistent", () => {
+    assert.throws(
+      () => parseManifest({ ...manifestJson, status: "building", launchDate: "2026-09-20" }),
+      /must keep launchDate null/,
+    );
+    assert.throws(
+      () => parseManifest({ ...manifestJson, status: "testing", launchDate: null }),
+      /require a launchDate/,
+    );
+    assert.equal(
+      parseManifest({ ...manifestJson, status: "testing", launchDate: "2026-09-20" }).launchDate,
+      "2026-09-20",
+    );
+  });
+
   it("rejects malformed sponsor inventory", () => {
     assert.throws(
       () =>
@@ -32,6 +47,26 @@ describe("experiment manifest", () => {
           ],
         }),
       /priceInr/,
+    );
+  });
+
+  it("rejects unknown sponsor inventory fields", () => {
+    assert.throws(
+      () =>
+        parseManifest({
+          ...manifestJson,
+          sponsorInventory: [
+            {
+              id: "founding-node",
+              label: "Founding Node",
+              priceInr: 499,
+              quantity: 20,
+              status: "available",
+              paymentReference: "must-never-be-public",
+            },
+          ],
+        }),
+      /property paymentReference is not allowed/,
     );
   });
 });

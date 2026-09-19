@@ -54,6 +54,7 @@ const ALLOWED_KEYS = new Set([
   "sponsorInventory",
   "analyticsIdentifier",
 ]);
+const SPONSOR_KEYS = new Set(["id", "label", "priceInr", "quantity", "status"]);
 
 function isIsoDate(value: string): boolean {
   if (!ISO_DATE.test(value)) return false;
@@ -99,6 +100,12 @@ export function parseManifest(value: unknown): ExperimentManifest {
   ) {
     throw new Error("Manifest launchDate must be an ISO date or null");
   }
+  if (["backlog", "building"].includes(candidate.status as string) && candidate.launchDate !== null) {
+    throw new Error("Backlog and building manifests must keep launchDate null");
+  }
+  if (!["backlog", "building"].includes(candidate.status as string) && candidate.launchDate === null) {
+    throw new Error("Testing and later manifests require a launchDate");
+  }
   if (
     typeof candidate.hypothesis !== "string" ||
     candidate.hypothesis.length < 20 ||
@@ -114,6 +121,10 @@ export function parseManifest(value: unknown): ExperimentManifest {
       throw new Error("Sponsor inventory entries must be objects");
     }
     const sponsor = item as Record<string, unknown>;
+    const unknownSponsorKey = Object.keys(sponsor).find((key) => !SPONSOR_KEYS.has(key));
+    if (unknownSponsorKey) {
+      throw new Error(`Sponsor inventory property ${unknownSponsorKey} is not allowed`);
+    }
     if (typeof sponsor.id !== "string" || !SLUG.test(sponsor.id)) {
       throw new Error("Sponsor inventory id must be kebab-case");
     }
